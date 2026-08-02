@@ -55,7 +55,7 @@ export async function signup(
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: `${origin}/auth/callback?next=/dashboard`,
     },
   });
 
@@ -89,7 +89,7 @@ export async function requestPasswordReset(
   const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/confirm?next=/reset-password`,
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
   });
 
   if (error) {

@@ -13,18 +13,28 @@ export async function updateProfile(
   formData: FormData
 ): Promise<ProfileActionState> {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { error } = await supabase.auth.updateUser({
-    data: {
-      full_name: String(formData.get("fullName") ?? "").trim(),
+  if (!user) {
+    return { error: "You must be signed in." };
+  }
+
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      name: String(formData.get("fullName") ?? "").trim(),
       household_address: String(formData.get("householdAddress") ?? "").trim(),
       phone: String(formData.get("phone") ?? "").trim(),
       notify_events: formData.get("notifyEvents") === "on",
       notify_announcements: formData.get("notifyAnnouncements") === "on",
       notify_volunteer: formData.get("notifyVolunteer") === "on",
       notify_marketplace: formData.get("notifyMarketplace") === "on",
+      updated_at: new Date().toISOString(),
     },
-  });
+    { onConflict: "id" }
+  );
 
   if (error) {
     return { error: error.message };

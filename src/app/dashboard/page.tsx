@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getProfile } from "@/lib/supabase/profile";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -9,13 +10,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-function getFirstName(user: { email?: string; user_metadata?: Record<string, unknown> }) {
-  const fullName = user.user_metadata?.full_name;
-  if (typeof fullName === "string" && fullName.trim()) {
-    return fullName.trim().split(" ")[0];
+function getFirstName(name: string | null | undefined, email: string | undefined) {
+  if (name && name.trim()) {
+    return name.trim().split(" ")[0];
   }
-  if (user.email) {
-    return user.email.split("@")[0];
+  if (email) {
+    return email.split("@")[0];
   }
   return "there";
 }
@@ -69,7 +69,8 @@ export default async function DashboardPage() {
     redirect("/login?redirectTo=/dashboard");
   }
 
-  const firstName = getFirstName(user);
+  const profile = await getProfile(supabase, user.id);
+  const firstName = getFirstName(profile?.name, user.email);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">

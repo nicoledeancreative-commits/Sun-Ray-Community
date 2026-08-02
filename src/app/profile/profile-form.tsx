@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { Profile } from "@/lib/supabase/profile";
 import { updateProfile, type ProfileActionState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,18 +19,19 @@ import { LogoutButton } from "@/components/logout-button";
 
 const initialState: ProfileActionState = {};
 
-export function ProfileForm({ user }: { user: User }) {
+export function ProfileForm({
+  email,
+  profile,
+}: {
+  email: string;
+  profile: Profile | null;
+}) {
   const [state, formAction, pending] = useActionState(
     updateProfile,
     initialState
   );
 
-  const metadata = user.user_metadata ?? {};
-  const initial = (
-    typeof metadata.full_name === "string" && metadata.full_name.trim()
-      ? metadata.full_name.trim()
-      : user.email ?? "?"
-  )
+  const initial = (profile?.name?.trim() || email || "?")
     .charAt(0)
     .toUpperCase();
 
@@ -70,11 +71,7 @@ export function ProfileForm({ user }: { user: User }) {
             <Input
               id="fullName"
               name="fullName"
-              defaultValue={
-                typeof metadata.full_name === "string"
-                  ? metadata.full_name
-                  : ""
-              }
+              defaultValue={profile?.name ?? ""}
               placeholder="Your name"
             />
           </div>
@@ -89,18 +86,14 @@ export function ProfileForm({ user }: { user: User }) {
             <Input
               id="householdAddress"
               name="householdAddress"
-              defaultValue={
-                typeof metadata.household_address === "string"
-                  ? metadata.household_address
-                  : ""
-              }
+              defaultValue={profile?.household_address ?? ""}
               placeholder="Not shared publicly"
             />
           </div>
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" value={user.email ?? ""} disabled />
+            <Input id="email" value={email} disabled />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -114,9 +107,7 @@ export function ProfileForm({ user }: { user: User }) {
               id="phone"
               name="phone"
               type="tel"
-              defaultValue={
-                typeof metadata.phone === "string" ? metadata.phone : ""
-              }
+              defaultValue={profile?.phone ?? ""}
               placeholder="For event RSVPs and volunteer sign-ups"
             />
           </div>
@@ -154,28 +145,28 @@ export function ProfileForm({ user }: { user: User }) {
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               name="notifyEvents"
-              defaultChecked={metadata.notify_events !== false}
+              defaultChecked={profile?.notify_events ?? true}
             />
             Email me about new events
           </label>
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               name="notifyAnnouncements"
-              defaultChecked={metadata.notify_announcements !== false}
+              defaultChecked={profile?.notify_announcements ?? true}
             />
             Email me about announcements
           </label>
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               name="notifyVolunteer"
-              defaultChecked={metadata.notify_volunteer !== false}
+              defaultChecked={profile?.notify_volunteer ?? true}
             />
             Notify me about volunteer opportunities
           </label>
           <label className="flex items-center gap-2 text-sm">
             <Checkbox
               name="notifyMarketplace"
-              defaultChecked={metadata.notify_marketplace !== false}
+              defaultChecked={profile?.notify_marketplace ?? true}
             />
             Notify me about new Buy &amp; Sell posts
           </label>

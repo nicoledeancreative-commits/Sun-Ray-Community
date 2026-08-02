@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/profile";
+import { getAnnouncements } from "@/lib/supabase/announcements";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -32,12 +35,6 @@ const WIDGETS: {
     description:
       "The monthly potluck, movie nights, and Summer Lunch Program hours.",
     empty: "No events posted yet — check back soon.",
-  },
-  {
-    icon: "📣",
-    title: "Latest Announcements",
-    description: "News from the volunteers who run the center.",
-    empty: "No announcements yet.",
   },
   {
     icon: "🤝",
@@ -71,6 +68,7 @@ export default async function DashboardPage() {
 
   const profile = await getProfile(supabase, user.id);
   const firstName = getFirstName(profile?.name, user.email);
+  const announcements = await getAnnouncements(supabase, 3);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
@@ -80,7 +78,54 @@ export default async function DashboardPage() {
       </h1>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {WIDGETS.map((widget) => (
+        {WIDGETS.slice(0, 1).map((widget) => (
+          <Card key={widget.title}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <span aria-hidden>{widget.icon}</span>
+                {widget.title}
+              </CardTitle>
+              <CardDescription>{widget.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">{widget.empty}</p>
+            </CardContent>
+          </Card>
+        ))}
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <span aria-hidden>📣</span>
+              Latest Announcements
+            </CardTitle>
+            <CardDescription>
+              News from the volunteers who run the center.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            {announcements.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No announcements yet.
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {announcements.map((announcement) => (
+                  <li key={announcement.id} className="text-sm">
+                    <span className="font-medium">{announcement.title}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div>
+              <Button asChild variant="link" className="h-auto p-0">
+                <Link href="/announcements">View all announcements →</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {WIDGETS.slice(1).map((widget) => (
           <Card key={widget.title}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">

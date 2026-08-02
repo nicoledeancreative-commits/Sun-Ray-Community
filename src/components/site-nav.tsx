@@ -21,6 +21,9 @@ export async function SiteNav() {
               <Link href="/dashboard">Dashboard</Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
+              <Link href="/announcements">Announcements</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
               <Link href="/profile">Profile</Link>
             </Button>
             <LogoutButton />

@@ -12,6 +12,11 @@ export type LinkButton = {
   href: string;
 };
 
+export type GroupRule = {
+  title: string;
+  body: string;
+};
+
 export type SiteContent = {
   homepage_hero_title: string;
   homepage_hero_subtitle: string;
@@ -22,6 +27,8 @@ export type SiteContent = {
   homepage_get_involved_buttons: LinkButton[];
   homepage_quick_note: string;
   dashboard_about: string;
+  dashboard_banner_url: string;
+  group_rules: GroupRule[];
 };
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
@@ -63,6 +70,33 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     "<p>Sun Ray Community Center Volunteers is volunteer-run and focused solely on the community center. We don't manage homes, yards, or private property, and participation in everything we do is completely voluntary.</p>",
   dashboard_about:
     "<p>Sun Ray Community Center Volunteers is a volunteer-run group focused on the care, operation, and availability of the Sun Ray Community Center in Frostproof, FL.</p>",
+  dashboard_banner_url: "",
+  group_rules: [
+    {
+      title: "No hate speech or bullying",
+      body: "Make sure everyone feels safe. Bullying of any kind isn't allowed, and degrading comments about things like race, religion, culture, sexual orientation, gender or identity will not be tolerated.",
+    },
+    {
+      title: "Be kind and courteous",
+      body: "We're all in this together to create a welcoming environment. Let's treat everyone with respect. Healthy debates are natural, but kindness is required.",
+    },
+    {
+      title: "Respect everyone's privacy",
+      body: "Being part of this group requires mutual trust. Authentic, expressive discussions make groups great, but may also be sensitive and private. What's shared in the group should stay in the group.",
+    },
+    {
+      title: "No promotions or spam except by residents",
+      body: "Residents are free to post their offerings here. If the small business is not located in the community, please refrain from posting it here. Please limit it to one post per day. If you have multiple items or services, please post them together in one post.",
+    },
+    {
+      title: "No political posts",
+      body: "Any posts will be removed; repeated posts will get you removed.",
+    },
+    {
+      title: "Authentic profiles required",
+      body: "Members must use a genuine profile that reasonably identifies them as a real person. Accounts using fake names, having little or no history, or appearing to exist mainly to provoke arguments may be removed. Disagreement is allowed, but anonymous or questionable accounts will not be permitted to disrupt the group. Admins may request private verification before approving or retaining membership.",
+    },
+  ],
 };
 
 export async function getSiteContent(

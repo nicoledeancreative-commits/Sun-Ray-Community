@@ -219,3 +219,103 @@ export async function updateDashboardAbout(
 
   return afterSave();
 }
+
+const MAX_BANNER_BYTES = 5 * 1024 * 1024;
+const BANNER_STORAGE_PATH = "banner/dashboard-banner";
+
+export async function updateDashboardBanner(
+  _prevState: ContentActionState,
+  formData: FormData
+): Promise<ContentActionState> {
+  const { supabase, error } = await requireAdmin();
+  if (error) return { error };
+
+  const file = formData.get("banner");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Please choose an image to upload." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { error: "Please upload an image file." };
+  }
+  if (file.size > MAX_BANNER_BYTES) {
+    return { error: "Image is too large. Please keep it under 5MB." };
+  }
+
+  const { error: uploadError } = await supabase.storage
+    .from("site-images")
+    .upload(BANNER_STORAGE_PATH, file, {
+      upsert: true,
+      contentType: file.type,
+    });
+  if (uploadError) return { error: uploadError.message };
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("site-images").getPublicUrl(BANNER_STORAGE_PATH);
+
+  const { error: dbError } = await setContent(
+    supabase,
+    "dashboard_banner_url",
+    `${publicUrl}?t=${Date.now()}`
+  );
+  if (dbError) return { error: dbError.message };
+
+  return afterSave();
+}
+
+export async function removeDashboardBanner(
+  _prevState: ContentActionState,
+  _formData: FormData
+): Promise<ContentActionState> {
+  const { supabase, error } = await requireAdmin();
+  if (error) return { error };
+
+  await supabase.storage.from("site-images").remove([BANNER_STORAGE_PATH]);
+
+  const { error: dbError } = await setContent(
+    supabase,
+    "dashboard_banner_url",
+    ""
+  );
+  if (dbError) return { error: dbError.message };
+
+  return afterSave();
+}
+
+export async function updateGroupRules(
+  _prevState: ContentActionState,
+  formData: FormData
+): Promise<ContentActionState> {
+  const { supabase, error } = await requireAdmin();
+  if (error) return { error };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("rules_json") ?? "[]"));
+  } catch {
+    return { error: "Something went wrong reading the rules. Please retry." };
+  }
+
+  if (!Array.isArray(parsed)) {
+    return { error: "Something went wrong reading the rules. Please retry." };
+  }
+
+  const rules = parsed
+    .map((rule) => ({
+      title: String((rule as { title?: unknown })?.title ?? "").trim(),
+      body: String((rule as { body?: unknown })?.body ?? "").trim(),
+    }))
+    .filter((rule) => rule.title || rule.body);
+
+  if (rules.length === 0) {
+    return { error: "Please add at least one rule before saving." };
+  }
+  if (rules.some((rule) => !rule.title || !rule.body)) {
+    return { error: "Please give every rule both a title and a description." };
+  }
+
+  const { error: dbError } = await setContent(supabase, "group_rules", rules);
+  if (dbError) return { error: dbError.message };
+
+  return afterSave();
+}

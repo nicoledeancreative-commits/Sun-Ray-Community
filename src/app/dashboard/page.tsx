@@ -53,7 +53,16 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="h-32 rounded-xl bg-gradient-to-r from-primary/80 to-primary sm:h-44" />
+      <div className="h-32 overflow-hidden rounded-xl bg-gradient-to-r from-primary/80 to-primary sm:h-44">
+        {content.dashboard_banner_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={content.dashboard_banner_url}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        )}
+      </div>
 
       <div className="mb-6 flex flex-col gap-3 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -106,6 +115,29 @@ export default async function DashboardPage() {
                   post.
                 </span>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Group rules</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="flex flex-col gap-4 text-sm">
+                {content.group_rules.map((rule, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="font-medium text-muted-foreground">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {rule.title}
+                      </p>
+                      <p className="text-muted-foreground">{rule.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </CardContent>
           </Card>
 

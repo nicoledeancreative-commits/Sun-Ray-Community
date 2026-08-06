@@ -8,6 +8,8 @@ import { GetInvolvedForm } from "./get-involved-form";
 import { GetInvolvedButtonsForm } from "./get-involved-buttons-form";
 import { QuickNoteForm } from "./quick-note-form";
 import { DashboardAboutForm } from "./dashboard-about-form";
+import { BannerForm } from "./banner-form";
+import { GroupRulesForm } from "./group-rules-form";
 
 export default async function AdminContentPage() {
   const supabase = await createClient();
@@ -37,6 +39,7 @@ export default async function AdminContentPage() {
       </p>
 
       <div className="flex flex-col gap-6">
+        <BannerForm bannerUrl={content.dashboard_banner_url} />
         <HeroForm
           title={content.homepage_hero_title}
           subtitle={content.homepage_hero_subtitle}
@@ -50,6 +53,7 @@ export default async function AdminContentPage() {
         <GetInvolvedButtonsForm buttons={content.homepage_get_involved_buttons} />
         <QuickNoteForm note={content.homepage_quick_note} />
         <DashboardAboutForm about={content.dashboard_about} />
+        <GroupRulesForm rules={content.group_rules} />
       </div>
     </div>
   );

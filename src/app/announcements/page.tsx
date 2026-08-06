@@ -3,16 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/profile";
 import { getAnnouncements } from "@/lib/supabase/announcements";
 import { AnnouncementForm } from "./announcement-form";
-import { DeleteAnnouncementButton } from "./delete-announcement-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+import { AnnouncementItem } from "./announcement-item";
 
 export default async function AnnouncementsPage() {
   const supabase = await createClient();
@@ -43,27 +34,11 @@ export default async function AnnouncementsPage() {
           </p>
         ) : (
           announcements.map((announcement) => (
-            <Card key={announcement.id}>
-              <CardHeader>
-                <CardTitle className="text-base">{announcement.title}</CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {formatDate(announcement.created_at)}
-                  {announcement.author_name
-                    ? ` · ${announcement.author_name}`
-                    : ""}
-                </p>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <p className="whitespace-pre-wrap text-sm">
-                  {announcement.body}
-                </p>
-                {canPost && (
-                  <div>
-                    <DeleteAnnouncementButton id={announcement.id} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <AnnouncementItem
+              key={announcement.id}
+              announcement={announcement}
+              canManage={canPost}
+            />
           ))
         )}
       </div>

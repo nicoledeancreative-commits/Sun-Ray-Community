@@ -1,5 +1,6 @@
 "use server";
 
+import DOMPurify from "isomorphic-dompurify";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/profile";
@@ -8,6 +9,12 @@ export type AnnouncementActionState = {
   error?: string;
   success?: string;
 };
+
+const ALLOWED_TAGS = ["p", "strong", "em", "ul", "ol", "li", "br"];
+
+function sanitizeBody(html: string) {
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS });
+}
 
 export async function createAnnouncement(
   _prevState: AnnouncementActionState,
@@ -23,7 +30,7 @@ export async function createAnnouncement(
   }
 
   const title = String(formData.get("title") ?? "").trim();
-  const body = String(formData.get("body") ?? "").trim();
+  const body = sanitizeBody(String(formData.get("body") ?? "")).trim();
 
   if (!title || !body) {
     return { error: "Please fill in both a title and a message." };
@@ -42,6 +49,41 @@ export async function createAnnouncement(
   revalidatePath("/announcements");
   revalidatePath("/dashboard");
   return { success: "Announcement posted." };
+}
+
+export async function updateAnnouncement(
+  id: string,
+  _prevState: AnnouncementActionState,
+  formData: FormData
+): Promise<AnnouncementActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in." };
+  }
+
+  const title = String(formData.get("title") ?? "").trim();
+  const body = sanitizeBody(String(formData.get("body") ?? "")).trim();
+
+  if (!title || !body) {
+    return { error: "Please fill in both a title and a message." };
+  }
+
+  const { error } = await supabase
+    .from("announcements")
+    .update({ title, body, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/announcements");
+  revalidatePath("/dashboard");
+  return { success: "Announcement updated." };
 }
 
 export async function deleteAnnouncement(id: string) {

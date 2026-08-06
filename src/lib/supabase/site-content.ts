@@ -5,6 +5,13 @@ export type WhatWeDoItem = {
   description: string;
 };
 
+export type LinkButton = {
+  label: string;
+  // Empty href means "use the smart default" (signup if signed out,
+  // dashboard if signed in) — see homepage rendering.
+  href: string;
+};
+
 export type SiteContent = {
   homepage_hero_title: string;
   homepage_hero_subtitle: string;
@@ -12,6 +19,7 @@ export type SiteContent = {
   homepage_what_we_do: WhatWeDoItem[];
   homepage_get_involved_title: string;
   homepage_get_involved_body: string;
+  homepage_get_involved_buttons: LinkButton[];
   homepage_quick_note: string;
   dashboard_about: string;
 };
@@ -46,6 +54,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   homepage_get_involved_title: "Get Involved",
   homepage_get_involved_body:
     "<p>Whether you want to volunteer a few hours, donate supplies, or just show up to the next potluck — there's a place for you here.</p>",
+  homepage_get_involved_buttons: [
+    { label: "Become a Volunteer", href: "" },
+    { label: "Make a Donation", href: "" },
+    { label: "View Upcoming Events", href: "" },
+  ],
   homepage_quick_note:
     "<p>Sun Ray Community Center Volunteers is volunteer-run and focused solely on the community center. We don't manage homes, yards, or private property, and participation in everything we do is completely voluntary.</p>",
   dashboard_about:

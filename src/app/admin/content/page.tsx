@@ -5,6 +5,7 @@ import { getSiteContent } from "@/lib/supabase/site-content";
 import { HeroForm } from "./hero-form";
 import { WhatWeDoForm } from "./what-we-do-form";
 import { GetInvolvedForm } from "./get-involved-form";
+import { GetInvolvedButtonsForm } from "./get-involved-buttons-form";
 import { QuickNoteForm } from "./quick-note-form";
 import { DashboardAboutForm } from "./dashboard-about-form";
 
@@ -46,6 +47,7 @@ export default async function AdminContentPage() {
           title={content.homepage_get_involved_title}
           body={content.homepage_get_involved_body}
         />
+        <GetInvolvedButtonsForm buttons={content.homepage_get_involved_buttons} />
         <QuickNoteForm note={content.homepage_quick_note} />
         <DashboardAboutForm about={content.dashboard_about} />
       </div>

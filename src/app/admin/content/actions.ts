@@ -45,6 +45,11 @@ async function setContent(
   );
 }
 
+function isSafeHref(href: string) {
+  if (href === "") return true;
+  return /^\/(?!\/)/.test(href) || /^https:\/\//.test(href);
+}
+
 function afterSave(): ContentActionState {
   revalidatePath("/");
   revalidatePath("/dashboard");
@@ -129,6 +134,38 @@ export async function updateGetInvolved(
   ]);
   const failed = results.find((r) => r.error);
   if (failed?.error) return { error: failed.error.message };
+
+  return afterSave();
+}
+
+export async function updateGetInvolvedButtons(
+  _prevState: ContentActionState,
+  formData: FormData
+): Promise<ContentActionState> {
+  const { supabase, error } = await requireAdmin();
+  if (error) return { error };
+
+  const buttons = [];
+  for (let i = 0; i < 3; i++) {
+    const label = String(formData.get(`label_${i}`) ?? "").trim();
+    const href = String(formData.get(`href_${i}`) ?? "").trim();
+    if (!label) {
+      return { error: "Please give every button a label." };
+    }
+    if (!isSafeHref(href)) {
+      return {
+        error: `"${href}" isn't a valid link. Use a page path starting with / (like /dashboard) or a full https:// link.`,
+      };
+    }
+    buttons.push({ label, href });
+  }
+
+  const { error: dbError } = await setContent(
+    supabase,
+    "homepage_get_involved_buttons",
+    buttons
+  );
+  if (dbError) return { error: dbError.message };
 
   return afterSave();
 }

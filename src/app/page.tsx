@@ -74,15 +74,26 @@ export default async function Home() {
           dangerouslySetInnerHTML={{ __html: content.homepage_get_involved_body }}
         />
         <div className="flex flex-wrap justify-center gap-3">
-          <Button asChild>
-            <Link href={primaryHref}>Become a Volunteer</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={primaryHref}>Make a Donation</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={primaryHref}>View Upcoming Events</Link>
-          </Button>
+          {content.homepage_get_involved_buttons.map((button, i) => {
+            const href = button.href || primaryHref;
+            const external = href.startsWith("https://");
+            return (
+              <Button
+                key={i}
+                asChild
+                variant={i === 0 ? "default" : "outline"}
+              >
+                <Link
+                  href={href}
+                  {...(external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  {button.label}
+                </Link>
+              </Button>
+            );
+          })}
         </div>
       </section>
 

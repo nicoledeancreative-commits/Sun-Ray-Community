@@ -59,11 +59,6 @@ export function GetInvolvedForm({
             />
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            The three buttons below this text (Become a Volunteer, Make a
-            Donation, View Upcoming Events) aren&apos;t editable here yet.
-          </p>
-
           <div>
             <Button type="submit" disabled={pending}>
               {pending ? "Saving..." : "Save"}

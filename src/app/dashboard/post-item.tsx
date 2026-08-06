@@ -70,7 +70,7 @@ export function PostItem({
       <CardContent className="flex flex-col gap-3">
         {isHtml ? (
           <div
-            className={RICH_TEXT_CLASSES}
+            className={`${RICH_TEXT_CLASSES} text-sm`}
             dangerouslySetInnerHTML={{ __html: post.body }}
           />
         ) : (

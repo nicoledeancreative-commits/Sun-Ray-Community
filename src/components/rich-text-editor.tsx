@@ -51,7 +51,7 @@ export function RichTextEditor({
       attributes: {
         class: cn(
           RICH_TEXT_CLASSES,
-          "min-h-32 rounded-md rounded-t-none border border-t-0 border-input bg-transparent px-3 py-2 focus:outline-none"
+          "min-h-32 rounded-md rounded-t-none border border-t-0 border-input bg-transparent px-3 py-2 text-sm focus:outline-none"
         ),
       },
     },

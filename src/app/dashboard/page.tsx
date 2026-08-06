@@ -1,8 +1,12 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/profile";
 import { getPosts, getMemberCount } from "@/lib/supabase/posts";
+import { getSiteContent } from "@/lib/supabase/site-content";
+import { RICH_TEXT_CLASSES } from "@/lib/rich-text-classes";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -35,14 +39,16 @@ export default async function DashboardPage() {
 
   const profile = await getProfile(supabase, user.id);
   const firstName = getFirstName(profile?.name, user.email);
-  const isModerator = profile?.role === "admin" || profile?.role === "moderator";
+  const isAdmin = profile?.role === "admin";
+  const isModerator = isAdmin || profile?.role === "moderator";
   const initial = (profile?.name?.trim() || user.email || "?")
     .charAt(0)
     .toUpperCase();
 
-  const [posts, memberCount] = await Promise.all([
+  const [posts, memberCount, content] = await Promise.all([
     getPosts(supabase),
     getMemberCount(supabase),
+    getSiteContent(supabase),
   ]);
 
   return (
@@ -59,6 +65,11 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button asChild variant="outline">
+              <Link href="/admin/content">Edit Page Content</Link>
+            </Button>
+          )}
           <InviteButton />
         </div>
       </div>
@@ -82,11 +93,10 @@ export default async function DashboardPage() {
               <CardTitle className="text-base">About</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <p>
-                Sun Ray Community Center Volunteers is a volunteer-run group
-                focused on the care, operation, and availability of the Sun
-                Ray Community Center in Frostproof, FL.
-              </p>
+              <div
+                className={RICH_TEXT_CLASSES}
+                dangerouslySetInnerHTML={{ __html: content.dashboard_about }}
+              />
               <div className="flex items-start gap-2">
                 <span aria-hidden>🔒</span>
                 <span>

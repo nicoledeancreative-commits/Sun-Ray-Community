@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteContent } from "@/lib/supabase/site-content";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,28 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const WHAT_WE_DO = [
-  {
-    title: "Host community events",
-    description:
-      "Including our monthly potluck, movie nights, and seasonal get-togethers.",
-  },
-  {
-    title: "Run the Summer Lunch Program",
-    description:
-      "Free lunches for kids and teens 18 and under, all summer long.",
-  },
-  {
-    title: "Keep the community center available",
-    description:
-      "Residents can rent it for parties, family gatherings, showers, classes, and more.",
-  },
-  {
-    title: "Rely on volunteers and donations",
-    description: "Everything we do is made possible by neighbors pitching in.",
-  },
-];
+import { RICH_TEXT_CLASSES } from "@/lib/rich-text-classes";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -37,15 +17,16 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   const primaryHref = user ? "/dashboard" : "/signup";
+  const content = await getSiteContent(supabase);
 
   return (
     <div className="flex flex-col">
       <section className="flex flex-col items-center gap-6 px-4 py-24 text-center">
         <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-          Welcome to Sun Ray Homes
+          {content.homepage_hero_title}
         </h1>
         <p className="max-w-xl text-lg text-muted-foreground">
-          Your neighborhood, your community center, your neighbors.
+          {content.homepage_hero_subtitle}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild size="lg">
@@ -58,14 +39,10 @@ export default async function Home() {
       </section>
 
       <section className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p className="text-muted-foreground">
-          Sun Ray Community Center Volunteers is a group of neighbors who keep
-          the Sun Ray Community Center running — cared for, open, and
-          available for the people who live here. We&apos;re not a
-          homeowners&apos; association, and we don&apos;t oversee homes,
-          yards, or private property. Our job is simple: take care of the
-          community center and bring neighbors together.
-        </p>
+        <div
+          className={`${RICH_TEXT_CLASSES} text-muted-foreground`}
+          dangerouslySetInnerHTML={{ __html: content.homepage_intro }}
+        />
       </section>
 
       <section id="what-we-do" className="mx-auto max-w-4xl px-4 py-12">
@@ -73,7 +50,7 @@ export default async function Home() {
           What We Do
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {WHAT_WE_DO.map((item) => (
+          {content.homepage_what_we_do.map((item) => (
             <Card key={item.title}>
               <CardHeader>
                 <CardTitle className="text-base">{item.title}</CardTitle>
@@ -90,12 +67,12 @@ export default async function Home() {
 
       <section className="mx-auto max-w-2xl px-4 py-12 text-center">
         <h2 className="mb-3 text-2xl font-semibold tracking-tight">
-          Get Involved
+          {content.homepage_get_involved_title}
         </h2>
-        <p className="mb-6 text-muted-foreground">
-          Whether you want to volunteer a few hours, donate supplies, or just
-          show up to the next potluck — there&apos;s a place for you here.
-        </p>
+        <div
+          className={`${RICH_TEXT_CLASSES} mb-6 text-muted-foreground`}
+          dangerouslySetInnerHTML={{ __html: content.homepage_get_involved_body }}
+        />
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild>
             <Link href={primaryHref}>Become a Volunteer</Link>
@@ -110,12 +87,10 @@ export default async function Home() {
       </section>
 
       <section className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p className="text-sm text-muted-foreground">
-          Sun Ray Community Center Volunteers is volunteer-run and focused
-          solely on the community center. We don&apos;t manage homes, yards,
-          or private property, and participation in everything we do is
-          completely voluntary.
-        </p>
+        <div
+          className={`${RICH_TEXT_CLASSES} text-muted-foreground`}
+          dangerouslySetInnerHTML={{ __html: content.homepage_quick_note }}
+        />
       </section>
     </div>
   );
